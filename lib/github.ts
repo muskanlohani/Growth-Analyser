@@ -1,4 +1,5 @@
-import { extractUsername } from "./analysis";
+import { extractUsername, RepoLite } from "./analysis";
+import type { GithubEvent, GithubUser } from "./types";
 
 export class GithubFetchError extends Error {
   code: "NOT_FOUND" | "RATE_LIMIT" | "NETWORK_ERROR" | "UNKNOWN";
@@ -39,5 +40,9 @@ export async function fetchGithub(rawUsername: string) {
   }
 
   const data = await res.json();
-  return { user: data.user, repos: Array.isArray(data.repos) ? data.repos : [] };
+  return {
+    user: data.user as GithubUser,
+    repos: (Array.isArray(data.repos) ? data.repos : []) as RepoLite[],
+    events: (Array.isArray(data.events) ? data.events : []) as GithubEvent[],
+  };
 }
